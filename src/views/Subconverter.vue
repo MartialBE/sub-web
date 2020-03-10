@@ -3,7 +3,10 @@
     <el-row style="margin-top: 10px">
       <el-col>
         <el-card>
-          <div slot="header">Subscription Converter</div>
+          <div slot="header">
+            Subscription Converter
+            <svg-icon icon-class="github" style="margin-left: 20px" @click="goToProject" />
+          </div>
           <el-container>
             <el-form :model="form" label-width="120px" label-position="left" style="width: 100%">
               <el-form-item label="模式设置:">
@@ -78,6 +81,9 @@
                         <el-checkbox v-model="form.sort" label="排序节点"></el-checkbox>
                       </el-row>
                       <el-row>
+                        <el-checkbox v-model="form.appendType" label="节点类型"></el-checkbox>
+                      </el-row>
+                      <el-row>
                         <el-checkbox v-model="form.udp" label="启用 UDP"></el-checkbox>
                       </el-row>
                       <el-row>
@@ -106,6 +112,17 @@
                   <el-button
                     slot="append"
                     v-clipboard:copy="customSubUrl"
+                    v-clipboard:success="onCopy"
+                    ref="copy-btn"
+                    icon="el-icon-document-copy"
+                  >复制</el-button>
+                </el-input>
+              </el-form-item>
+              <el-form-item label="订阅短链接:">
+                <el-input class="copy-content" disabled v-model="curtomShortSubUrl">
+                  <el-button
+                    slot="append"
+                    v-clipboard:copy="curtomShortSubUrl"
                     v-clipboard:success="onCopy"
                     ref="copy-btn"
                     icon="el-icon-document-copy"
@@ -153,37 +170,21 @@
     </el-row>
 
     <el-dialog
-      title="Remote config upload"
       :visible.sync="dialogUploadConfigVisible"
       :show-close="false"
       :close-on-click-modal="false"
       :close-on-press-escape="false"
       width="700px"
     >
-      <el-form label-position="left" label-width="150px">
-        <el-form-item prop="uploadPasswordItem">
-          <div slot="label">
-            密码：
-            <el-popover trigger="hover" placement="right">
-              <el-link
-                type="primary"
-                :href="myBot"
-                target="_blank"
-                icon="el-icon-s-promotion"
-              >@CareyWong_bot</el-link>
-              <i class="el-icon-question" slot="reference"></i>
-            </el-popover>
-          </div>
-          <el-input v-model="uploadPassword" show-password placeholder="请输入密码" style="width: 250px"></el-input>
-        </el-form-item>
+      <div slot="title">
+        Remote config upload
+        <el-popover trigger="hover" placement="right" style="margin-left: 10px">
+          <el-link type="primary" :href="sampleConfig" target="_blank" icon="el-icon-info">参考配置</el-link>
+          <i class="el-icon-question" slot="reference"></i>
+        </el-popover>
+      </div>
+      <el-form label-position="left">
         <el-form-item prop="uploadConfig">
-          <div slot="label">
-            RemoteConfig：
-            <el-popover trigger="hover" placement="right">
-              <el-link type="primary" :href="sampleConfig" target="_blank" icon="el-icon-info">参考配置</el-link>
-              <i class="el-icon-question" slot="reference"></i>
-            </el-popover>
-          </div>
           <el-input
             v-model="uploadConfig"
             type="textarea"
@@ -206,11 +207,12 @@
 </template>
 
 <script>
+const project = "https://github.com/CareyWang/sub-web";
 const remoteConfigSample =
   "https://raw.githubusercontent.com/tindy2013/subconverter/master/base/config/example_external_config.ini";
 const gayhubRelease = "https://github.com/tindy2013/subconverter/releases";
 const defaultBackend = "https://api.wcc.best/sub?";
-const shortUrlBackend = "https://api.wcc.best/short";
+const shortUrlBackend = "https://s.wcc.best/short";
 const configUploadBackend = "https://api.wcc.best/config/upload";
 const tgBotLink = "https://t.me/CareyWong_bot";
 
@@ -234,9 +236,7 @@ export default {
           ssr: "ssr",
           ssd: "ssd"
         },
-        backendOptions: [
-          { value: "http://127.0.0.1:25500/sub?" }
-        ],
+        backendOptions: [{ value: "http://127.0.0.1:25500/sub?" }],
         remoteConfig: [
           {
             label: "universal",
@@ -292,66 +292,6 @@ export default {
                   "https://raw.githubusercontent.com/CareyWang/Rules/master/RemoteConfig/special/netease.ini"
               }
             ]
-          },
-          {
-            label: "友商推荐",
-            options: [
-              {
-                label: "ACL4SSR_Online 与Github规则同步",
-                value:
-                  "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_Online.ini"
-              },
-              {
-                label: "ACL4SSR_Online_Mini 精简版 与Github规则同步",
-                value:
-                  "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_Online_Mini.ini"
-              },
-              {
-                label: "ACL4SSR_Online_NoAuto 与Github规则同步",
-                value:
-                  "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_Online_NoAuto.ini"
-              },
-              {
-                label: "ACL4SSR",
-                value:
-                  "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR.ini"
-              },
-              {
-                label: "ACL4SSR_Mini 精简版",
-                value:
-                  "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_Mini.ini"
-              },
-              {
-                label: "ACL4SSR_BackCN",
-                value:
-                  "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_BackCN.ini"
-              },
-              {
-                label: "ACL4SSR_NoApple",
-                value:
-                  "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_NoApple.ini"
-              },
-              {
-                label: "ACL4SSR_NoAuto",
-                value:
-                  "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_NoAuto.ini"
-              },
-              {
-                label: "ACL4SSR_NoAuto_NoApple",
-                value:
-                  "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_NoAuto_NoApple.ini"
-              },
-              {
-                label: "ACL4SSR_NoMicrosoft",
-                value:
-                  "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_NoMicrosoft.ini"
-              },
-              {
-                label: "ACL4SSR_WithGFW",
-                value:
-                  "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_WithGFW.ini"
-              }
-            ]
           }
         ]
       },
@@ -370,11 +310,13 @@ export default {
         udp: false,
         tfo: false,
         scv: false,
-        fdn: false
+        fdn: false,
+        appendType: false
       },
 
       loading: false,
       customSubUrl: "",
+      curtomShortSubUrl: "",
 
       dialogUploadConfigVisible: false,
       uploadConfig: "",
@@ -393,6 +335,9 @@ export default {
   methods: {
     onCopy() {
       this.$message.success("Copied!");
+    },
+    goToProject() {
+      window.open(project);
     },
     gotoGayhub() {
       window.open(gayhubRelease);
@@ -456,6 +401,10 @@ export default {
           this.customSubUrl +=
             "&filename=" + encodeURIComponent(this.form.filename);
         }
+        if (this.form.appendType) {
+          this.customSubUrl +=
+            "&append_type=" + this.form.appendType.toString();
+        }
 
         this.customSubUrl +=
           "&emoji=" +
@@ -485,10 +434,18 @@ export default {
 
       this.loading = true;
 
+      let data = new FormData();
+      data.append("longUrl", btoa(this.customSubUrl));
+
       this.$axios
-        .get(shortUrlBackend + "?longUrl=" + btoa(this.customSubUrl))
+        .post(shortUrlBackend, data, {
+          header: {
+            "Content-Type": "application/form-data; charset=utf-8"
+          }
+        })
         .then(res => {
           if (res.data.Code === 1 && res.data.ShortUrl !== "") {
+            this.curtomShortSubUrl = res.data.ShortUrl;
             this.$copyText(res.data.ShortUrl);
             this.$message.success("短链接已复制到剪贴板");
           } else {
