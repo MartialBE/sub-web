@@ -6,6 +6,8 @@
           <div slot="header">
             Subscription Converter
             <svg-icon icon-class="github" style="margin-left: 20px" @click="goToProject" />
+
+            <div style="display: inline-block; position:absolute; right: 20px">{{ backendVersion }}</div>
           </div>
           <el-container>
             <el-form :model="form" label-width="120px" label-position="left" style="width: 100%">
@@ -73,29 +75,38 @@
                 <el-form-item label-width="0px">
                   <el-row type="flex">
                     <el-col>
-                      <el-checkbox v-model="form.nodeList" label="输出为 Node List" border></el-checkbox>
                       <el-checkbox v-model="form.emoji" label="Emoji" border></el-checkbox>
+                      <el-checkbox v-model="form.nodeList" label="输出为 Node List" border></el-checkbox>
                     </el-col>
-                    <el-popover v-model="form.extraset">
+                    <el-popover placement="bottom" v-model="form.extraset">
                       <el-row>
-                        <el-checkbox v-model="form.sort" label="排序节点"></el-checkbox>
-                      </el-row>
-                      <el-row>
-                        <el-checkbox v-model="form.appendType" label="节点类型"></el-checkbox>
+                        <el-checkbox v-model="form.new_name" label="Clash New Field"></el-checkbox>
                       </el-row>
                       <el-row>
                         <el-checkbox v-model="form.udp" label="启用 UDP"></el-checkbox>
                       </el-row>
                       <el-row>
-                        <el-checkbox v-model="form.tfo" label="启用 TFO"></el-checkbox>
+                        <el-checkbox v-model="form.appendType" label="节点类型"></el-checkbox>
                       </el-row>
                       <el-row>
-                        <el-checkbox v-model="form.scv" label="跳过证书验证"></el-checkbox>
+                        <el-checkbox v-model="form.sort" label="排序节点"></el-checkbox>
                       </el-row>
                       <el-row>
                         <el-checkbox v-model="form.fdn" label="过滤非法节点"></el-checkbox>
                       </el-row>
                       <el-button slot="reference">更多选项</el-button>
+                    </el-popover>
+                    <el-popover placement="bottom" style="margin-left: 20px">
+                      <el-row>
+                        <el-checkbox v-model="form.tpl.surge.doh" label="Surge.DoH"></el-checkbox>
+                      </el-row>
+                      <el-row>
+                        <el-checkbox v-model="form.tpl.clash.doh" label="Clash.DoH"></el-checkbox>
+                      </el-row>
+                      <el-row>
+                        <el-checkbox v-model="form.insert" label="网易云"></el-checkbox>
+                      </el-row>
+                      <el-button slot="reference">定制功能</el-button>
                     </el-popover>
                   </el-row>
                 </el-form-item>
@@ -189,7 +200,7 @@
             v-model="uploadConfig"
             type="textarea"
             :autosize="{ minRows: 15, maxRows: 15}"
-            maxlength="3000"
+            maxlength="5000"
             show-word-limit
           ></el-input>
         </el-form-item>
@@ -212,14 +223,18 @@ const remoteConfigSample =
   "https://raw.githubusercontent.com/tindy2013/subconverter/master/base/config/example_external_config.ini";
 const gayhubRelease = "https://github.com/tindy2013/subconverter/releases";
 const defaultBackend = "https://api.wcc.best/sub?";
-const shortUrlBackend = "https://s.wcc.best/short";
+const shortUrlBackend = "https://api.suo.yt/short";
 const configUploadBackend = "https://api.wcc.best/config/upload";
 const tgBotLink = "https://t.me/CareyWong_bot";
 
 export default {
   data() {
     return {
+      backendVersion: "",
       advanced: "2",
+
+      // 是否为 PC 端
+      isPC: true,
 
       options: {
         clientTypes: {
@@ -234,7 +249,8 @@ export default {
           Loon: "loon",
           ss: "ss",
           ssr: "ssr",
-          ssd: "ssd"
+          ssd: "ssd",
+          v2ray: "v2ray"
         },
         backendOptions: [{ value: "http://127.0.0.1:25500/sub?" }],
         remoteConfig: [
@@ -244,12 +260,12 @@ export default {
               {
                 label: "No-Urltest",
                 value:
-                  "https://raw.githubusercontent.com/CareyWang/Rules/master/RemoteConfig/universal/no-urltest.ini"
+                  "https://subconverter.oss-ap-southeast-1.aliyuncs.com/Rules/RemoteConfig/universal/no-urltest.ini"
               },
               {
                 label: "Urltest",
                 value:
-                  "https://raw.githubusercontent.com/CareyWang/Rules/master/RemoteConfig/universal/urltest.ini"
+                  "https://subconverter.oss-ap-southeast-1.aliyuncs.com/Rules/RemoteConfig/universal/urltest.ini"
               }
             ]
           },
@@ -259,27 +275,57 @@ export default {
               {
                 label: "Maying",
                 value:
-                  "https://raw.githubusercontent.com/CareyWang/Rules/master/RemoteConfig/customized/maying.ini"
+                  "https://subconverter.oss-ap-southeast-1.aliyuncs.com/Rules/RemoteConfig/customized/maying.ini"
               },
               {
-                label: "Nexitally",
+                label: "rixCloud",
                 value:
-                  "https://raw.githubusercontent.com/CareyWang/Rules/master/RemoteConfig/customized/nexitally.ini"
+                  "https://subconverter.oss-ap-southeast-1.aliyuncs.com/Rules/RemoteConfig/customized/rixcloud.ini"
               },
               {
                 label: "YoYu",
                 value:
-                  "https://raw.githubusercontent.com/CareyWang/Rules/master/RemoteConfig/customized/yoyu.ini"
+                  "https://subconverter.oss-ap-southeast-1.aliyuncs.com/Rules/RemoteConfig/customized/yoyu.ini"
               },
               {
                 label: "Ytoo",
                 value:
-                  "https://raw.githubusercontent.com/CareyWang/Rules/master/RemoteConfig/customized/ytoo.ini"
+                  "https://subconverter.oss-ap-southeast-1.aliyuncs.com/Rules/RemoteConfig/customized/ytoo.ini"
+              },
+              {
+                label: "NyanCAT",
+                value:
+                  "https://subconverter.oss-ap-southeast-1.aliyuncs.com/Rules/RemoteConfig/customized/nyancat.ini"
+              },
+              {
+                label: "Nexitally",
+                value:
+                  "https://subconverter.oss-ap-southeast-1.aliyuncs.com/Rules/RemoteConfig/customized/nexitally.ini"
+              },
+              {
+                label: "SoCloud",
+                value:
+                  "https://subconverter.oss-ap-southeast-1.aliyuncs.com/Rules/RemoteConfig/customized/socloud.ini"
+              },
+              {
+                label: "ARK",
+                value:
+                  "https://subconverter.oss-ap-southeast-1.aliyuncs.com/Rules/RemoteConfig/customized/ark.ini"
+              },
+              {
+                label: "ssrCloud",
+                value:
+                  "https://subconverter.oss-ap-southeast-1.aliyuncs.com/Rules/RemoteConfig/customized/ssrcloud.ini"
               },
               {
                 label: "贼船",
                 value:
-                  "https://raw.githubusercontent.com/CareyWang/Rules/master/RemoteConfig/customized/zeichuan.ini"
+                  "https://subconverter.oss-ap-southeast-1.aliyuncs.com/Rules/RemoteConfig/customized/zeichuan.ini"
+              },
+              {
+                label: "布丁",
+                value:
+                  "https://subconverter.oss-ap-southeast-1.aliyuncs.com/Rules/RemoteConfig/customized/pud.ini"
               }
             ]
           },
@@ -289,7 +335,12 @@ export default {
               {
                 label: "NeteaseUnblock(仅规则，No-Urltest)",
                 value:
-                  "https://raw.githubusercontent.com/CareyWang/Rules/master/RemoteConfig/special/netease.ini"
+                  "https://subconverter.oss-ap-southeast-1.aliyuncs.com/Rules/RemoteConfig/special/netease.ini"
+              },
+              {
+                label: "Basic(仅GEOIP CN + Final)",
+                value:
+                  "https://subconverter.oss-ap-southeast-1.aliyuncs.com/Rules/RemoteConfig/special/basic.ini"
               }
             ]
           }
@@ -311,7 +362,19 @@ export default {
         tfo: false,
         scv: false,
         fdn: false,
-        appendType: false
+        appendType: false,
+        insert: false, // 是否插入默认订阅的节点，对应配置项 insert_url
+        new_name: true, // 是否使用 Clash 新字段
+
+        // tpl 定制功能
+        tpl: {
+          surge: {
+            doh: false // dns 查询是否使用 DoH
+          },
+          clash: {
+            doh: false
+          }
+        }
       },
 
       loading: false,
@@ -327,10 +390,12 @@ export default {
   },
   created() {
     document.title = "Subscription Converter";
+    this.isPC = this.$getOS().isPc;
   },
   mounted() {
-    this.form.clientType = "clashr";
+    this.form.clientType = "clash";
     this.notify();
+    this.getBackendVersion();
   },
   methods: {
     onCopy() {
@@ -352,7 +417,14 @@ export default {
       }
 
       const url = "clash://install-config?url=";
-      window.open(url + encodeURIComponent(this.customSubUrl));
+      window.open(
+        url +
+          encodeURIComponent(
+            this.curtomShortSubUrl !== ""
+              ? this.curtomShortSubUrl
+              : this.customSubUrl
+          )
+      );
     },
     surgeInstall() {
       if (this.customSubUrl === "") {
@@ -375,14 +447,16 @@ export default {
           : this.form.customBackend;
 
       let sourceSub = this.form.sourceSubUrl;
-      sourceSub = sourceSub.replace(/[\n|\r|\n\r]/g, "|");
+      sourceSub = sourceSub.replace(/(\n|\r|\n\r)/g, "|");
 
       this.customSubUrl =
         backend +
         "target=" +
         this.form.clientType +
         "&url=" +
-        encodeURIComponent(sourceSub);
+        encodeURIComponent(sourceSub) +
+        "&insert=" +
+        this.form.insert;
 
       if (this.advanced === "2") {
         if (this.form.remoteConfig !== "") {
@@ -421,6 +495,14 @@ export default {
           this.form.fdn.toString() +
           "&sort=" +
           this.form.sort.toString();
+
+        if (this.form.tpl.surge.doh === true) {
+          this.customSubUrl += "&surge.doh=true";
+        }
+
+        if (this.form.clientType === "clash") {
+          this.customSubUrl += "&new_name=" + this.form.new_name.toString();
+        }
       }
 
       this.$copyText(this.customSubUrl);
@@ -528,6 +610,16 @@ export default {
           candidate.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0
         );
       };
+    },
+    getBackendVersion() {
+      this.$axios
+        .get(
+          defaultBackend.substring(0, defaultBackend.length - 5) + "/version"
+        )
+        .then(res => {
+          this.backendVersion = res.data.replace(/backend\n$/gm, "");
+          this.backendVersion = this.backendVersion.replace("subconverter", "");
+        });
     }
   }
 };
