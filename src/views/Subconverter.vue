@@ -223,7 +223,7 @@ const remoteConfigSample =
   "https://raw.githubusercontent.com/tindy2013/subconverter/master/base/config/example_external_config.ini";
 const gayhubRelease = "https://github.com/tindy2013/subconverter/releases";
 const defaultBackend = "https://api.wcc.best/sub?";
-const shortUrlBackend = "https://api.suo.yt/short";
+const shortUrlBackend = "https://x16.in/yourls-api.php";
 const configUploadBackend = "https://api.wcc.best/config/upload";
 const tgBotLink = "https://t.me/CareyWong_bot";
 
@@ -252,7 +252,7 @@ export default {
           ssd: "ssd",
           v2ray: "v2ray"
         },
-        backendOptions: [{ value: "http://127.0.0.1:25500/sub?" }],
+        backendOptions: [{ value: "https://subapi.x16.in/sub?" }],
         remoteConfig: [
           {
             label: "universal",
@@ -272,6 +272,31 @@ export default {
           {
             label: "customized",
             options: [
+             {
+                label: "ACL4SSR_Online_Full",
+                value:
+                  "https://raw.githubusercontent.com/tindy2013/subconverter/master/base/config/ACL4SSR_Online_Full.ini"
+              },
+              {
+                label: "ACL4SSR_Online_AdblockPlus",
+                value:
+                  "https://raw.githubusercontent.com/tindy2013/subconverter/master/base/config/ACL4SSR_Online_AdblockPlus.ini"
+              },
+              {
+                label: "ACL4SSR_Online",
+                value:
+                  "https://raw.githubusercontent.com/tindy2013/subconverter/master/base/config/ACL4SSR_Online.ini"
+              },
+              {
+                label: "ACL4SSR_Online_Mini",
+                value:
+                  "https://raw.githubusercontent.com/tindy2013/subconverter/master/base/config/ACL4SSR_Online_Mini.ini"
+              },
+              {
+                label: "ACL4SSR_Online_Mini_AdblockPlus",
+                value:
+                  "https://raw.githubusercontent.com/tindy2013/subconverter/master/base/config/ACL4SSR_Online_Mini_AdblockPlus.ini"
+              },
               {
                 label: "Maying",
                 value:
