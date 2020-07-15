@@ -222,7 +222,7 @@ const project = "https://github.com/CareyWang/sub-web";
 const remoteConfigSample =
   "https://raw.githubusercontent.com/tindy2013/subconverter/master/base/config/example_external_config.ini";
 const gayhubRelease = "https://github.com/tindy2013/subconverter/releases";
-const defaultBackend = "https://api.wcc.best/sub?";
+const defaultBackend = "https://subapi.x16.in/sub?";
 const shortUrlBackend = "https://x16.in/yourls-api.php";
 const configUploadBackend = "https://api.wcc.best/config/upload";
 const tgBotLink = "https://t.me/CareyWong_bot";
@@ -542,21 +542,21 @@ export default {
       this.loading = true;
 
       let data = new FormData();
-      data.append("longUrl", btoa(this.customSubUrl));
-
+      data.append("url", this.customSubUrl);
+      data.append("format", "json");
+      data.append("action", "shorturl");
+      data.append("signature", "972df33980");
       this.$axios
         .post(shortUrlBackend, data, {
-          header: {
-            "Content-Type": "application/form-data; charset=utf-8"
-          }
+          
         })
         .then(res => {
-          if (res.data.Code === 1 && res.data.ShortUrl !== "") {
-            this.curtomShortSubUrl = res.data.ShortUrl;
-            this.$copyText(res.data.ShortUrl);
+          if (res.data.status === "success" && res.data.shorturl !== "") {
+            this.curtomShortSubUrl = res.data.shorturl;
+            this.$copyText(res.data.shorturl);
             this.$message.success("短链接已复制到剪贴板");
           } else {
-            this.$message.error("短链接获取失败：" + res.data.Message);
+            this.$message.error("短链接获取失败：" + res.data.message);
           }
         })
         .catch(() => {
